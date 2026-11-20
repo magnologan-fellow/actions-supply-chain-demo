@@ -3,7 +3,8 @@
 #
 #   1. Actions pinned to full 40-char commit SHAs
 #   2. GITHUB_TOKEN explicitly scoped to contents: read
-#   3. Untrusted code runs in a job that holds NO secrets
+#   3. Untrusted code runs in a job that holds no deploy secrets
+#      (only a read-only GITHUB_TOKEN, not persisted to .git/config)
 #   4. Cloud creds come from OIDC, so nothing long-lived exists to steal
 # ============================================================
 
@@ -18,7 +19,7 @@ permissions:
   contents: read
 
 jobs:
-  # ---- Job 1: runs untrusted third-party code. Holds NOTHING. ----
+  # ---- Job 1: runs untrusted third-party code. No secrets, read-only token. ----
   analyze:
     runs-on: ubuntu-latest
     permissions:
@@ -32,9 +33,9 @@ jobs:
       - name: Analyze changed files
         uses: ./demo-action
         env:
-          DEMO_LISTENER: ${{ vars.DEMO_LISTENER }} # Safer with no env, just for demo purposes
-          # No secrets reach this step.
-          # Even fully compromised, this action has nothing to harvest.
+          DEMO_LISTENER: ${{ vars.DEMO_LISTENER }}   # optional lab listener, to show it receives nothing
+          # No secrets are referenced anywhere in this job, so they never
+          # reach this runner, not in env and not in Runner.Worker memory.
 
   # ---- Job 2: holds the privileges. Runs only first-party code. ----
   deploy:
