@@ -19,6 +19,9 @@ whose tag had been moved to a malicious commit days earlier (CVE-2025-30154).
 | `.github/workflows/vulnerable.yml` | Mutable tag reference, unscoped `GITHUB_TOKEN`, secrets in the same job as untrusted code |
 | `.github/workflows/hardened.yml` | SHA-pinned actions, `contents: read`, job split, OIDC |
 | `demo-action/action.yml` | Stand-in for the compromised third-party action |
+| `demo.sh` | Live driver: pre-flight, then each part step by step with an Enter pause |
+| `RUNBOOK.md` | Presenter cue sheet: pre-flight, what to type, what to expect, fallbacks |
+| `NARRATION.md` | Speaker notes: the spoken line per step, with sources, plus likely questions |
 
 ## The mechanism, in one paragraph
 
@@ -70,6 +73,17 @@ repo are public.
    (or `gh workflow run vulnerable.yml` / `gh workflow run hardened.yml`).
 4. Compare the `Analyze changed files` step output and the
    `GITHUB_TOKEN Permissions` block under `Set up job`.
+
+Or drive it live, step by step (needs `gh` logged in to your fork):
+
+```bash
+./demo.sh preflight      # checks settings, runs both workflows, caches logs
+./demo.sh vulnerable     # part 1, Enter between steps
+./demo.sh hardened       # part 2
+./demo.sh all --offline  # replay the cached runs with no network
+```
+
+See RUNBOOK.md for the full on-stage sequence.
 
 ## Sources
 
